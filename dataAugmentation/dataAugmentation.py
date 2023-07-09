@@ -1,14 +1,9 @@
 import os
 import json
-from multiprocessing import Pool
-import asyncio
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 import threading
 import os
-
-# Cos'è?
-scope = "user-library-read"
 
 # Creazione Spotify
 spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials())
@@ -20,7 +15,7 @@ def get_track_features(track):
     @param id spotify della traccia 
     @return dizionario con chiave la traccia e valore le informazioni estratte associate
     """
-    
+
     track_uri = track["track_uri"]   # id traccia
     artist_uri = track["artist_uri"] # id artista
     artist_dict = {}                 # dizionario per le informazioni associate all'artista
@@ -112,11 +107,14 @@ def get_playlist_for_files(start, end, dataset_dir):
         print("Processing file: " + file)
         # per ognuno di questi file estrae le informazioni 
         get_track_features_multiprocessing(dataset_dir + file, file)
-     
+    
+#======================================================================================
+#=========================================MAIN=========================================
+#======================================================================================
 if __name__ == "__main__":
 
-    dataset_dir = "dataset/data/"
-    augmented_dataset_dir = "dataset/augmented_data/"
+    dataset_dir = "../dataset/data/"
+    augmented_dataset_dir = "../dataset/augmented_data/"
 
     # numero di core disponibili (-1 per lasciarlo all'applicazione)    
     num_cores = os.cpu_count() - 1
