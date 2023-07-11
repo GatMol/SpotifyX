@@ -11,4 +11,7 @@
 
 ## Struttura del progetto
 - [data augmentation](./dataAugmentation), contiene tutto il necessario per arricchire i dati con informazioni aggiuntive delle canzoni presenti nelle playlist del dataset
-- [dataset](./dataset/data/), contiene tutti i file di [spotify_million](https://www.kaggle.com/datasets/himanshuwagh/spotify-million)
+- [dataset](./dataset/), 
+  - [data](./dataset/data), contiene tutti i file di [spotify_million](https://www.kaggle.com/datasets/himanshuwagh/spotify-million)
+  - [augmented_data](./dataset/augmented_data), contiene i file (di cui sopra), arricchiti con informazioni aggiuntive
+  - [tmp_aug_playlists](./dataset/tmp_aug_playlists/), contiene i file di cui sopra, contenenti tanti file quante sono le playlists già processate
