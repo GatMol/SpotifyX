@@ -39,7 +39,9 @@ for file in files:
             continue
         producer.send('json-topic', playlist)
         playlist_ids["ids"].append(playlist["pid"])
+        json.dump(playlist_ids, open(playlist_path, "w"))
         current_batch_size += 1
+
 
         # every batch_size playlists, sleep for time_to_sleep seconds
         if current_batch_size == batch_size:
