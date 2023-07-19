@@ -1,7 +1,7 @@
 #!/usr/bin/env python
-# top 100 (per num_followers) spotify playlists con almeno 10 tracks
+# top 10 playlist per ciascuna track
+
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col
 import argparse
 
 # create argument parser
@@ -13,21 +13,19 @@ parser.add_argument("--output", help="the output directory path", type=str)
 spark = SparkSession. \
             builder. \
             config("spark.driver.host", "localhost"). \
-            appName("Top100Followers"). \
+            appName("Top10Track_playlists"). \
             getOrCreate()
 
-# read the input file
+# parse the arguments
 args = parser.parse_args()
 input_file = args.input
 output_dir = args.output
 
+# read the input file
 input_df = spark.read.json(input_file).cache()
+
+# get the playlists
 playlist_df = input_df.select("playlists")
 
-playlist_df = playlist_df.select("*").where(col("num_tracks") > 10)
-
-playlist_df = playlist_df.sort(col("num_followers", ascending=False)).limit(100).cache()
-
-playlist_df.show()
-
-playlist_df.write.json(output_dir + "/top100followers_playlist.json")
+# get for each track all the playlists in which it appears
+# TODO: termina lo script 
