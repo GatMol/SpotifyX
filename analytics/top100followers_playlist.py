@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # top 100 (per num_followers) spotify playlists con almeno 10 tracks
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col
+from pyspark.sql.functions import col, desc
 import argparse
 
 # create argument parser
@@ -22,11 +22,10 @@ input_file = args.input
 output_dir = args.output
 
 input_df = spark.read.json(input_file).cache()
-playlist_df = input_df.select("playlists")
 
-playlist_df = playlist_df.select("*").where(col("num_tracks") > 10)
+playlist_df = input_df.select("*").where(col("num_tracks") > 10)
 
-playlist_df = playlist_df.sort(col("num_followers", ascending=False)).limit(100).cache()
+playlist_df = playlist_df.sort(desc("num_followers")).limit(100)
 
 playlist_df.show()
 
