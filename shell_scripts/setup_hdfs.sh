@@ -5,9 +5,7 @@ echo "Setting up HDFS..."
 
 # Create HDFS directories
 echo "Creating HDFS directories..."
-hdfs dfs -mkdir /user
-hdfs dfs -mkdir /user/spotifyx
-hdfs dfs -mkdir /user/spotifyx/input
+hdfs dfs -mkdir -p /user/spotifyx/input
 hdfs dfs -mkdir /user/spotifyx/output
 
 src_dir=$(dirname $0)

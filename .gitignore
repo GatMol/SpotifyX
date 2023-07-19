@@ -166,3 +166,4 @@ cython_debug/
 dataset/*
 !dataset/README.md
 export_credentials.txt
+!*.py
