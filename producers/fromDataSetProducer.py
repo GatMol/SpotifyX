@@ -30,20 +30,20 @@ random.shuffle(files)
 for file in files:
     current_batch_size = 0
     
-    playlist_file = json.load(open(streaming_data_path + "/" + file, "r"))
-    playlists = playlist_file["playlists"]
-    for playlist in playlists:
-        
-        # if the playlist is already in the database, skip it
-        if playlist["pid"] in playlist_ids["ids"]:
-            continue
-        producer.send('json-topic', playlist)
-        playlist_ids["ids"].append(playlist["pid"])
-        json.dump(playlist_ids, open(playlist_path, "w"))
-        current_batch_size += 1
+    with open(streaming_data_path + "/" + file, "r") as playlists_file:
+        for playlist_obj in playlists_file:
+            playlist = json.loads(playlist_obj)
+            
+            # if the playlist is already in the database, skip it
+            if playlist["pid"] in playlist_ids["ids"]:
+                continue
+            producer.send('json-topic', playlist)
+            playlist_ids["ids"].append(playlist["pid"])
+            json.dump(playlist_ids, open(playlist_path, "w"))
+            current_batch_size += 1
 
 
-        # every batch_size playlists, sleep for time_to_sleep seconds
-        if current_batch_size == batch_size:
-            time.sleep(time_to_sleep)
-            current_batch_size = 0
+            # every batch_size playlists, sleep for time_to_sleep seconds
+            if current_batch_size == batch_size:
+                time.sleep(time_to_sleep)
+                current_batch_size = 0
