@@ -29,4 +29,4 @@ playlist_df = playlist_df.sort(desc("num_followers")).limit(100)
 
 playlist_df.show()
 
-playlist_df.write.json(output_dir + "/top100followers_playlist.json")
+playlist_df.write.json(output_dir + "/top100followers_playlist.json", mode="overwrite")
