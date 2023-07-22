@@ -61,7 +61,7 @@ for letter in alfabeto:
             # add current unix timestamp as the creation time of the playlist
             playlist["modified_at"] = int(time.time())
             playlist["num_tracks"] = got_playlist["tracks"]["total"]
-            playlist["num_albums"] = len(set([item["track"]["album"]["id"] for item in got_playlist["tracks"]["items"]]))
+            playlist["num_albums"] = len(set([item["track"]["album_name"] for item in got_playlist["tracks"]["items"]]))
             playlist["num_followers"] = got_playlist["followers"]["total"]
             playlist["tracks"] = []
             i = 0
