@@ -13,6 +13,7 @@ parser.add_argument("--input", help="the input directory or file path", type=str
 parser.add_argument("--output", help="the output directory path", type=str)
 
 # create spark session
+# configuration derived from https://stackoverflow.com/questions/21138751/spark-java-lang-outofmemoryerror-java-heap-space
 spark = SparkSession. \
             builder. \
             config("spark.driver.host", "localhost"). \
@@ -33,11 +34,10 @@ playlist_df = spark.read.json(input_file)
 # for each track get all the playlists in which it appears
 tracks_df = playlist_df.withColumn("track", explode("tracks"))
 
-# create a window partitioned by track_name and ordered by num_followers
-window = Window.partitionBy("track.track_name").orderBy(desc("num_followers"))
-
 tracks_df = tracks_df.select("track", "name", "num_followers")
 
+# create a window partitioned by track_name and ordered by num_followers
+window = Window.partitionBy("track.track_name").orderBy(desc("num_followers"))
 # get the top 10 playlists for each track ordered by num_followers
 top10track_playlist_df = tracks_df.withColumn("rank", row_number().over(window)) \
                                     .where(col("rank") <= 10) 
