@@ -13,6 +13,9 @@ parser.add_argument("--output", help="the output directory path", type=str)
 spark = SparkSession. \
             builder. \
             config("spark.driver.host", "localhost"). \
+            config("spark.executor.memory", "8g"). \
+            config("spark.storage.memoryFraction", "0"). \
+            config("shuffle.memoryFraction", "0"). \
             appName("Top100Followers"). \
             getOrCreate()
 
@@ -29,4 +32,4 @@ playlist_df = playlist_df.sort(desc("num_followers")).limit(100)
 
 playlist_df.show()
 
-playlist_df.write.json(output_dir + "/top100followers_playlist.json")
+playlist_df.write.json(output_dir + "/top100followers_playlist.json", mode="overwrite")
