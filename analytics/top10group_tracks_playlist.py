@@ -20,7 +20,7 @@ spark = SparkSession. \
             config("spark.driver.memory", "16g"). \
             config("spark.executor.memory", "16g"). \
             config("spark.sql.broadcastTimeout", "36000"). \
-            appName("Top10Track_playlists"). \
+            appName("Top10GroupTracksPlaylist"). \
             getOrCreate()
 
 # parse the arguments
@@ -28,8 +28,10 @@ args = parser.parse_args()
 input_file = args.input
 output_dir = args.output
 
-# read the input file
-playlist_df = spark.read.json(input_file) 
+min_num_followers = 10
+combination_size = 3
+# read the input file and filter the playlists with at least 10 followers and num_tracks > 3
+playlist_df = spark.read.json(input_file).filter(col("num_followers") >= min_num_followers).filter(col("num_tracks") > combination_size)
 
 # explode the tracks column
 tracks_df = playlist_df.withColumn("track", explode("tracks"))
@@ -43,7 +45,7 @@ playlist_df = tracks_df.groupBy("name", "num_followers").agg(collect_set("track.
 @udf(ArrayType(ArrayType(StringType())))
 def calculate_group(tracks):
     group = []
-    group.extend(itertools.combinations(tracks, 3))
+    group.extend(itertools.combinations(tracks, combination_size))
     return group
 
 # calculate the group of 5 tracks for each playlist
