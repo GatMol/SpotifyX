@@ -17,9 +17,6 @@ parser.add_argument("--output", help="the output directory path", type=str)
 spark = SparkSession. \
             builder. \
             config("spark.driver.host", "localhost"). \
-            config("spark.driver.memory", "16g"). \
-            config("spark.executor.memory", "16g"). \
-            config("spark.sql.broadcastTimeout", "36000"). \
             appName("Top10groupArtists_playlists"). \
             getOrCreate()
 
