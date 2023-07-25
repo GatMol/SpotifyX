@@ -28,7 +28,7 @@ args = parser.parse_args()
 input_file = args.input
 output_dir = args.output
 
-min_num_followers = 10
+min_num_followers = 500
 combination_size = 3
 # read the input file and filter the playlists with at least 10 followers and num_tracks > 3
 playlist_df = spark.read.json(input_file).filter(col("num_followers") >= min_num_followers).filter(col("num_tracks") > combination_size)
