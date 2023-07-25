@@ -28,18 +28,18 @@ input_file = args.input
 output_dir = args.output
 
 # duration types (short, medium, long) in seconds
+duration_types = {"short": {"min": 0, "max": 1000}, "medium": {"min": 1000, "max": 10000}, "long": {"min": 10000, "max": 10000000000000}}
 
 min_num_followers = 5
 # read the input file and filter the playlists with at least 10 followers
 playlist_df = spark.read.json(input_file).filter(col("num_followers") >= min_num_followers) \
                                                     .select("name", "duration_ms", "num_followers")
-duration_types = {"short": {"min": 0, "max": 1000}, "medium": {"min": 1001, "max": 10000}, "long": {"min": 10001, "max": 10000000000000}}
 
 # assign duration type to each playlist based on the duration in seconds
 @udf(returnType=StringType())
 def get_duration_type(duration):
     for duration_type in duration_types.keys():
-        if duration_types[duration_type]["min"] <= duration <= duration_types[duration_type]["max"]:
+        if duration_types[duration_type]["min"] <= duration < duration_types[duration_type]["max"]:
             return duration_type
 
 duration_df = playlist_df.withColumn("duration_type", get_duration_type(col("duration_ms")/1000))
