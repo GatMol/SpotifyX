@@ -7,7 +7,10 @@ streaming_dir = current_dir + "/streaming_data"
 
 def flatten_data(dir_name):
     for file in os.listdir(dir_name):
-        data = json.load(open(dir_name + "/" + file, "r"))
+        try:
+            data = json.load(open(dir_name + "/" + file, "r"))
+        except:
+            print("Error in file: " + file)
 
         playlists = data["playlists"]
 
