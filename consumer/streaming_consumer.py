@@ -1,6 +1,12 @@
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, from_json, explode, log10
-from pyspark.sql.types import StructType, StructField, StringType, ArrayType, IntegerType
+from pyspark.sql.functions import col, from_json, explode, udf, expr
+from pyspark.sql.types import StructType, StructField, StringType, ArrayType, IntegerType, DoubleType, TimestampType
+from math import log
+import sys, os
+# get absolute path of project root folder
+projectRootPath = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.insert(0, projectRootPath)
+from analytics.streaming import orderPlaylistByFollowers, bestPlaylist4Artist, trendArtists
 
 # define spark session
 spark = SparkSession.builder.appName('StreamingConsumer').getOrCreate()
@@ -10,6 +16,7 @@ lines = spark.readStream.format('kafka').option('kafka.bootstrap.servers', 'loca
 
 # define schema for the streaming data
 schema = StructType([
+                StructField("timestamp", TimestampType()),
                 StructField("name", StringType()),
                 StructField("collaborative", StringType()),
                 StructField("pid", IntegerType()),
@@ -17,6 +24,7 @@ schema = StructType([
                 StructField("num_tracks", IntegerType()),
                 StructField("num_albums", IntegerType()),
                 StructField("num_followers", IntegerType()),
+                StructField("duration_ms", IntegerType()),
                 StructField("tracks", ArrayType(StructType([
                     StructField("pos", IntegerType()),
                     StructField("artist_name", StringType()),
@@ -32,28 +40,16 @@ schema = StructType([
 # convert the data from binary to string and then to json
 # kafka stream data are composed of key, value, topic, partition, offset, timestamp, timestampType
 # then select the parsed value and expand it to columns
-data = lines.select(from_json(col("value").cast("string"), schema).alias("parsed_value")).select(col("parsed_value.*")).filter(col("num_followers") > 100)
+data = lines.select(from_json(col("value").cast("string"), schema).alias("parsed_value")).select(col("parsed_value.*"))
 
-# TODO: metti un limite minimo di followers e magari fai un'analisi su quante playlist con pochi followers sono arrivate (per capire su quante, sono state fatte le analisi/sono inutili)
+# order playlists by number of followers
+# orderedPlaylistsStreamWriter = orderPlaylistByFollowers.orderPlaylistByFollowers(data)
+trendArtistsStreamWriter = trendArtists.trendArtists(data)
 
-data = data.withColumn("track", explode("tracks")).select("track.artist_name", "name", "num_followers")
+# start all streaming processing
+# orderedPlaylistsStreamWriter.start()
+trendArtistQuery = trendArtistsStreamWriter.start()
 
-# top listened artists (with more tracks in playlists and more followers of it)
-# group by artist name and count the number of tracks in a playlist
-data = data.groupBy("artist_name", "name", "num_followers").count().withColumnRenamed("count", "num_artist_tracks")
-
-# calculate listened artist index (number of tracks in playlists * log10(number of followers) / 250 (max number of tracks in a playlist))
-out2 = data.withColumn("index", col("num_artist_tracks") * log10(col("num_followers")) / 250)
-
-# out2 = out2.sort(col("artist_name").desc(), col("index").desc())
-
-dataStreamWriter = out2.writeStream.format('console').outputMode('complete')
-
-# Query execution
-query = dataStreamWriter.start()
-
-# Query explanation
-# query.explain()
-
-# To avoid termination while streaming data continues arriving
-query.awaitTermination()
+# await for all queries started
+# orderedPlaylistsStreamWriter.awaitTermination()
+trendArtistQuery.awaitTermination()
