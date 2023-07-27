@@ -1,17 +1,23 @@
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import explode, avg
+from pyspark.sql.functions import avg, window, bround
 
 
 def calculate_avg_stats(data):
-        
+
     # calculate average of:
     #  - number of tracks in a playlist
     #  - number of albums in a playlist
     #  - number of followers of a playlist
     #  - duration of a playlist
     #  - number of artists in a playlist
-    avg_data = data.select(avg("num_tracks"), avg("num_albums"), avg("num_followers"), avg("duration_ms"), avg("num_artists"))
+    windowed_data = data.groupBy(
+        window(data.timestamp, "10 seconds", "5 seconds")
+    ).agg(bround(avg("num_tracks"), 2).alias("avg_num_tracks"),
+          bround(avg("num_albums"), 2).alias("avg_num_albums"), 
+          bround(avg("num_followers"), 2).alias("avg_num_followers"), 
+          bround(avg("duration_ms"), 2).alias("avg_duration_ms"), 
+          bround(avg("num_artists"), 2).alias("avg_num_artists"))
 
     # TODO: write the result to mongodb
-    dataStreamWriter = avg_data.writeStream.format('console').outputMode('complete').trigger(processingTime='5 seconds')
+    dataStreamWriter = windowed_data.writeStream.format('console').outputMode('complete')
     return dataStreamWriter
