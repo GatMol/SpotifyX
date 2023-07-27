@@ -11,7 +11,7 @@ def calculate_avg_stats(data):
     #  - duration of a playlist
     #  - number of artists in a playlist
     windowed_data = data.groupBy(
-        window(data.timestamp, "10 seconds", "5 seconds")
+        window(data.timestamp, "10 minutes", "5 minutes")
     ).agg(bround(avg("num_tracks"), 2).alias("avg_num_tracks"),
           bround(avg("num_albums"), 2).alias("avg_num_albums"), 
           bround(avg("num_followers"), 2).alias("avg_num_followers"), 
