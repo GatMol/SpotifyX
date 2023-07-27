@@ -33,6 +33,7 @@ for file in files:
     with open(streaming_data_path + "/" + file, "r") as playlists_file:
         for playlist_obj in playlists_file:
             playlist = json.loads(playlist_obj)
+            playlist["timestamp"] = time.time()
             
             # if the playlist is already in the database, skip it
             if playlist["pid"] in playlist_ids["ids"]:

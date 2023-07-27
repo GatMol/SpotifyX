@@ -64,6 +64,8 @@ for letter in alfabeto:
             playlist["num_followers"] = got_playlist["followers"]["total"]
             playlist["tracks"] = []
             album_uris = set()
+            artist_uris = set()
+            duration_ms = 0
             i = 0
             # fullfill the tracks list of the playlist dictionary with the information from the spotify api
             for item in got_playlist["tracks"]["items"]:
@@ -79,10 +81,15 @@ for letter in alfabeto:
                 track["duration_ms"] = item["track"]["duration_ms"]
                 track["album_name"] = item["track"]["album"]["name"]
                 album_uris.add(item["track"]["album"]["uri"])
+                artist_uris.add(item["track"]["artists"][0]["uri"])
+                duration_ms += item["track"]["duration_ms"]
 
                 playlist["tracks"].append(track)
                 i += 1
             playlist["num_albums"] = len(album_uris)
+            playlist["duration_ms"] = duration_ms
+            playlist["num_artists"] = len(artist_uris)
+            playlist["timestamp"] = int(time.time())
 
             producer.send('json-topic', playlist)
             playlist_ids["ids"].append(playlist["pid"])
