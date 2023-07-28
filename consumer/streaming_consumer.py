@@ -1,12 +1,11 @@
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, from_json, explode, udf, expr
-from pyspark.sql.types import StructType, StructField, StringType, ArrayType, IntegerType, DoubleType, TimestampType
-from math import log
+from pyspark.sql.functions import col, from_json
+from pyspark.sql.types import StructType, StructField, StringType, ArrayType, IntegerType, TimestampType
 import sys, os
 # get absolute path of project root folder
 projectRootPath = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, projectRootPath)
-from analytics.streaming import orderPlaylistByFollowers, bestPlaylist4Artist, trendArtists
+from analytics.streaming import bestPlaylist4Artist, playlist2followers, trendArtists
 
 # define spark session
 spark = SparkSession.builder.appName('StreamingConsumer').getOrCreate()
@@ -42,14 +41,17 @@ schema = StructType([
 # then select the parsed value and expand it to columns
 data = lines.select(from_json(col("value").cast("string"), schema).alias("parsed_value")).select(col("parsed_value.*"))
 
-# order playlists by number of followers
-# orderedPlaylistsStreamWriter = orderPlaylistByFollowers.orderPlaylistByFollowers(data)
+# call the streaming processing functions
+playlist2followersStreamWriter = playlist2followers.playlist2followers(data)
 trendArtistsStreamWriter = trendArtists.trendArtists(data)
+bestPlaylist4ArtistStreamWriter = bestPlaylist4Artist.bestPlaylist4Artist(data)
 
 # start all streaming processing
-# orderedPlaylistsStreamWriter.start()
+playlist2followersQuery = playlist2followersStreamWriter.start()
 trendArtistQuery = trendArtistsStreamWriter.start()
+bestPlaylist4ArtistQuery = bestPlaylist4ArtistStreamWriter.start()
 
 # await for all queries started
-# orderedPlaylistsStreamWriter.awaitTermination()
+playlist2followersQuery.awaitTermination()
 trendArtistQuery.awaitTermination()
+bestPlaylist4ArtistQuery.awaitTermination()
