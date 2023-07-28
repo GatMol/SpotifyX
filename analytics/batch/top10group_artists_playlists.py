@@ -23,11 +23,11 @@ spark = SparkSession \
             .builder \
             .config("spark.driver.host", "localhost") \
             .appName("Top10groupArtists_playlists") \
-            .option("checkpointLocation", "/tmp/pyspark/") \
-            .option("forceDeleteTempCheckpointLocation", "true") \
-            .option("spark.mongodb.connection.uri", "mongodb://localhost") \
-            .option("spark.mongodb.database", "spotifyx") \
-            .option("spark.mongodb.collection", output_collection) \
+            .config("checkpointLocation", "/tmp/pyspark/") \
+            .config("forceDeleteTempCheckpointLocation", "true") \
+            .config("spark.mongodb.connection.uri", "mongodb://localhost") \
+            .config("spark.mongodb.database", "spotifyx") \
+            .config("spark.mongodb.collection", output_collection) \
             .getOrCreate()
 
 # read the input file
@@ -61,4 +61,4 @@ grouped_playlist_df = playlist_df.withColumn("rank", row_number().over(window_sp
 # order by group
 grouped_playlist_df = grouped_playlist_df.orderBy("groupArtists")
 # write the output file
-grouped_playlist_df.write.format("mongo").mode("overwrite").save()
+grouped_playlist_df.write.format("mongodb").mode("overwrite").save()

@@ -26,11 +26,11 @@ spark = SparkSession \
             .config("spark.storage.memoryFraction", "0") \
             .config("shuffle.memoryFraction", "0") \
             .appName("Top10Track_playlists") \
-            .option("checkpointLocation", "/tmp/pyspark/") \
-            .option("forceDeleteTempCheckpointLocation", "true") \
-            .option("spark.mongodb.connection.uri", "mongodb://localhost") \
-            .option("spark.mongodb.database", "spotifyx") \
-            .option("spark.mongodb.collection", output_collection) \
+            .config("checkpointLocation", "/tmp/pyspark/") \
+            .config("forceDeleteTempCheckpointLocation", "true") \
+            .config("spark.mongodb.connection.uri", "mongodb://localhost") \
+            .config("spark.mongodb.database", "spotifyx") \
+            .config("spark.mongodb.collection", output_collection) \
             .getOrCreate()
 
 # read the input file
@@ -51,4 +51,4 @@ top10track_playlist_df = tracks_df.withColumn("rank", row_number().over(window))
 top10track_playlist_df = top10track_playlist_df.select("track.track_name", "name", "num_followers").orderBy("track_name")
 
 # write the output file
-top10track_playlist_df.write.format("mongo").mode("overwrite").save()
+top10track_playlist_df.write.format("mongodb").mode("overwrite").save()

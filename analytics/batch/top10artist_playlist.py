@@ -24,11 +24,11 @@ spark = SparkSession \
             .config("spark.executor.memory", "8g") \
             .config("spark.storage.memoryFraction", "0.2") \
             .appName("Top10Artist_playlists") \
-            .option("checkpointLocation", "/tmp/pyspark/") \
-            .option("forceDeleteTempCheckpointLocation", "true") \
-            .option("spark.mongodb.connection.uri", "mongodb://localhost") \
-            .option("spark.mongodb.database", "spotifyx") \
-            .option("spark.mongodb.collection", output_collection) \
+            .config("checkpointLocation", "/tmp/pyspark/") \
+            .config("forceDeleteTempCheckpointLocation", "true") \
+            .config("spark.mongodb.connection.uri", "mongodb://localhost") \
+            .config("spark.mongodb.database", "spotifyx") \
+            .config("spark.mongodb.collection", output_collection) \
             .getOrCreate()
 
 # read the input file
@@ -49,4 +49,4 @@ top10artist_playlist_df = artist_df.withColumn("rank", row_number().over(window)
 # order by artist_name
 top10artist_playlist_df.orderBy("artist_name")
 
-top10artist_playlist_df.write.format("mongo").mode("overwrite").save()
+top10artist_playlist_df.write.format("mongodb").mode("overwrite").save()

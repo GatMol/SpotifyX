@@ -26,11 +26,11 @@ spark = SparkSession \
             .config("spark.executor.memory", "16g") \
             .config("spark.sql.broadcastTimeout", "36000") \
             .appName("Top10GroupTracksPlaylist") \
-            .option("checkpointLocation", "/tmp/pyspark/") \
-            .option("forceDeleteTempCheckpointLocation", "true") \
-            .option("spark.mongodb.connection.uri", "mongodb://localhost") \
-            .option("spark.mongodb.database", "spotifyx") \
-            .option("spark.mongodb.collection", output_collection) \
+            .config("checkpointLocation", "/tmp/pyspark/") \
+            .config("forceDeleteTempCheckpointLocation", "true") \
+            .config("spark.mongodb.connection.uri", "mongodb://localhost") \
+            .config("spark.mongodb.database", "spotifyx") \
+            .config("spark.mongodb.collection", output_collection) \
             .getOrCreate()
 
 min_num_followers = 500

@@ -25,11 +25,11 @@ spark = SparkSession \
             .config("spark.executor.memory", "10g") \
             .config("spark.sql.broadcastTimeout", "36000") \
             .appName("best_artist_playlist") \
-            .option("checkpointLocation", "/tmp/pyspark/") \
-            .option("forceDeleteTempCheckpointLocation", "true") \
-            .option("spark.mongodb.connection.uri", "mongodb://localhost") \
-            .option("spark.mongodb.database", "spotifyx") \
-            .option("spark.mongodb.collection", output_collection) \
+            .config("checkpointLocation", "/tmp/pyspark/") \
+            .config("forceDeleteTempCheckpointLocation", "true") \
+            .config("spark.mongodb.connection.uri", "mongodb://localhost") \
+            .config("spark.mongodb.database", "spotifyx") \
+            .config("spark.mongodb.collection", output_collection) \
             .getOrCreate()
 
 # read the input file and filter the playlists with at least 10 followers
@@ -57,4 +57,4 @@ artist_playlist_df = artist_playlist_df.withColumn("row_number", row_number().ov
 
 artist_playlist_df.show()
 
-artist_playlist_df.write.format("mongo").mode("overwrite").save()
+artist_playlist_df.write.format("mongodb").mode("overwrite").save()

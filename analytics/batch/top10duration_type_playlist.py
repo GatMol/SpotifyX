@@ -25,11 +25,11 @@ spark = SparkSession \
             .config("spark.executor.memory", "10g") \
             .config("spark.sql.broadcastTimeout", "36000") \
             .appName("Top10durationTypePlaylist") \
-            .option("checkpointLocation", "/tmp/pyspark/") \
-            .option("forceDeleteTempCheckpointLocation", "true") \
-            .option("spark.mongodb.connection.uri", "mongodb://localhost") \
-            .option("spark.mongodb.database", "spotifyx") \
-            .option("spark.mongodb.collection", output_collection) \
+            .config("checkpointLocation", "/tmp/pyspark/") \
+            .config("forceDeleteTempCheckpointLocation", "true") \
+            .config("spark.mongodb.connection.uri", "mongodb://localhost") \
+            .config("spark.mongodb.database", "spotifyx") \
+            .config("spark.mongodb.collection", output_collection) \
             .getOrCreate()
 
 # duration types (short, medium, long) in seconds
@@ -55,4 +55,4 @@ duration_df = duration_df.withColumn("rank", row_number().over(playlist_window))
                                                         .select("duration_type", "name", "num_followers", "duration_ms", "rank")
 
 # write the result to the output directory
-duration_df.write.format("mongo").mode("overwrite").save()
+duration_df.write.format("mongodb").mode("overwrite").save()

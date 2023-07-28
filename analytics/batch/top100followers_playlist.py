@@ -18,13 +18,13 @@ output_collection = args.output
 spark = SparkSession \
             .builder \
             .config("spark.driver.host", "localhost") \
-            .config("spark.executor.memory", "16g") \
+            .config("spark.executor.memory", "6g") \
             .appName("Top100Followers") \
-            .option("checkpointLocation", "/tmp/pyspark/") \
-            .option("forceDeleteTempCheckpointLocation", "true") \
-            .option("spark.mongodb.connection.uri", "mongodb://localhost") \
-            .option("spark.mongodb.database", "spotifyx") \
-            .option("spark.mongodb.collection", output_collection) \
+            .config("checkpointLocation", "/tmp/pyspark/") \
+            .config("forceDeleteTempCheckpointLocation", "true") \
+            .config("spark.mongodb.connection.uri", "mongodb://localhost") \
+            .config("spark.mongodb.database", "spotifyx") \
+            .config("spark.mongodb.collection", output_collection) \
             .getOrCreate()
 
 min_num_followers = 10
@@ -33,4 +33,4 @@ input_df = spark.read.json(input_file).filter(col("num_followers") >= min_num_fo
 
 playlist_df = input_df.sort(desc("num_followers")).limit(100)
 
-playlist_df.write.format("mongo").mode("overwrite").save()
+playlist_df.write.format("mongodb").mode("overwrite").save()
