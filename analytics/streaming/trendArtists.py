@@ -13,4 +13,10 @@ def trendArtists(df):
     # orderedResult = artist2numTracks.orderBy(col("num_artist_tracks_in_all_playlists").desc())
 
     # return orderedResult.writeStream.format('console').outputMode('complete')
-    return artist2numTracks.writeStream.format('console').outputMode('complete')
+    return artist2numTracks.writeStream.format("mongodb") \
+                                        .option("checkpointLocation", "/tmp/pyspark/") \
+                                        .option("forceDeleteTempCheckpointLocation", "true") \
+                                        .option("spark.mongodb.connection.uri", "mongodb://localhost") \
+                                        .option("spark.mongodb.database", "spotifyx") \
+                                        .option("spark.mongodb.collection", "trendArtists") \
+                                        .outputMode("complete")

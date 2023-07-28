@@ -11,22 +11,27 @@ import argparse
 # create argument parser
 parser = argparse.ArgumentParser()
 parser.add_argument("--input", help="the input directory or file path", type=str)
-parser.add_argument("--output", help="the output directory path", type=str)
-
-# create spark session
-spark = SparkSession. \
-            builder. \
-            config("spark.driver.host", "localhost"). \
-            config("spark.driver.memory", "16g"). \
-            config("spark.executor.memory", "16g"). \
-            config("spark.sql.broadcastTimeout", "36000"). \
-            appName("Top10GroupTracksPlaylist"). \
-            getOrCreate()
+parser.add_argument("--output", help="the output collection name", type=str)
 
 # parse the arguments
 args = parser.parse_args()
 input_file = args.input
-output_dir = args.output
+output_collection = args.output
+
+# create spark session
+spark = SparkSession \
+            .builder \
+            .config("spark.driver.host", "localhost") \
+            .config("spark.driver.memory", "16g") \
+            .config("spark.executor.memory", "16g") \
+            .config("spark.sql.broadcastTimeout", "36000") \
+            .appName("Top10GroupTracksPlaylist") \
+            .option("checkpointLocation", "/tmp/pyspark/") \
+            .option("forceDeleteTempCheckpointLocation", "true") \
+            .option("spark.mongodb.connection.uri", "mongodb://localhost") \
+            .option("spark.mongodb.database", "spotifyx") \
+            .option("spark.mongodb.collection", output_collection) \
+            .getOrCreate()
 
 min_num_followers = 500
 combination_size = 3
@@ -61,4 +66,4 @@ grouped_playlist_df = playlist_df.withColumn("rank", row_number().over(window_sp
 # order by group
 grouped_playlist_df = grouped_playlist_df.orderBy("group")
 # write the output file
-grouped_playlist_df.write.json(output_dir + "/top10group_tracks_playlist.json", mode="overwrite")
+grouped_playlist_df.write.format("mongo").mode("overwrite").save()

@@ -10,23 +10,28 @@ import argparse
 # create argument parser
 parser = argparse.ArgumentParser()
 parser.add_argument("--input", help="the input directory or file path", type=str)
-parser.add_argument("--output", help="the output directory path", type=str)
-
-# create spark session
-# configuration derived from https://stackoverflow.com/questions/21138751/spark-java-lang-outofmemoryerror-java-heap-space
-spark = SparkSession. \
-            builder. \
-            config("spark.driver.host", "localhost"). \
-            config("spark.executor.memory", "8g"). \
-            config("spark.storage.memoryFraction", "0"). \
-            config("shuffle.memoryFraction", "0"). \
-            appName("Top10Track_playlists"). \
-            getOrCreate()
+parser.add_argument("--output", help="the output collection name", type=str)
 
 # parse the arguments
 args = parser.parse_args()
 input_file = args.input
-output_dir = args.output
+output_collection = args.output
+
+# create spark session
+# configuration derived from https://stackoverflow.com/questions/21138751/spark-java-lang-outofmemoryerror-java-heap-space
+spark = SparkSession \
+            .builder \
+            .config("spark.driver.host", "localhost") \
+            .config("spark.executor.memory", "8g") \
+            .config("spark.storage.memoryFraction", "0") \
+            .config("shuffle.memoryFraction", "0") \
+            .appName("Top10Track_playlists") \
+            .option("checkpointLocation", "/tmp/pyspark/") \
+            .option("forceDeleteTempCheckpointLocation", "true") \
+            .option("spark.mongodb.connection.uri", "mongodb://localhost") \
+            .option("spark.mongodb.database", "spotifyx") \
+            .option("spark.mongodb.collection", output_collection) \
+            .getOrCreate()
 
 # read the input file
 playlist_df = spark.read.json(input_file) 
@@ -46,4 +51,4 @@ top10track_playlist_df = tracks_df.withColumn("rank", row_number().over(window))
 top10track_playlist_df = top10track_playlist_df.select("track.track_name", "name", "num_followers").orderBy("track_name")
 
 # write the output file
-top10track_playlist_df.write.json(output_dir + "/top10track_playlist.json", mode="overwrite")
+top10track_playlist_df.write.format("mongo").mode("overwrite").save()

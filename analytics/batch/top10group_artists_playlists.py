@@ -11,19 +11,24 @@ import argparse
 # create argument parser
 parser = argparse.ArgumentParser()
 parser.add_argument("--input", help="the input directory or file path", type=str)
-parser.add_argument("--output", help="the output directory path", type=str)
-
-# create spark session
-spark = SparkSession. \
-            builder. \
-            config("spark.driver.host", "localhost"). \
-            appName("Top10groupArtists_playlists"). \
-            getOrCreate()
+parser.add_argument("--output", help="the output collection name", type=str)
 
 # parse the arguments
 args = parser.parse_args()
 input_file = args.input
-output_dir = args.output
+output_collection = args.output
+
+# create spark session
+spark = SparkSession \
+            .builder \
+            .config("spark.driver.host", "localhost") \
+            .appName("Top10groupArtists_playlists") \
+            .option("checkpointLocation", "/tmp/pyspark/") \
+            .option("forceDeleteTempCheckpointLocation", "true") \
+            .option("spark.mongodb.connection.uri", "mongodb://localhost") \
+            .option("spark.mongodb.database", "spotifyx") \
+            .option("spark.mongodb.collection", output_collection) \
+            .getOrCreate()
 
 # read the input file
 playlist_df = spark.read.json(input_file, multiLine=True).filter("num_followers > 9")
@@ -56,4 +61,4 @@ grouped_playlist_df = playlist_df.withColumn("rank", row_number().over(window_sp
 # order by group
 grouped_playlist_df = grouped_playlist_df.orderBy("groupArtists")
 # write the output file
-grouped_playlist_df.write.json(output_dir + "/top10group_artists_playlist.json", mode="overwrite")
+grouped_playlist_df.write.format("mongo").mode("overwrite").save()

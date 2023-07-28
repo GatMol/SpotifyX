@@ -9,4 +9,10 @@ def trendTracks(df):
     # group by track and count how many are present in all playlists
     track2numTracks = tracks_df.groupBy(tracks_df.track_name).count().withColumnRenamed("count", "num_tracks_in_all_playlists")
 
-    return track2numTracks.writeStream.format('console').outputMode('complete')
+    return track2numTracks.writeStream.format("mongodb") \
+                                        .option("checkpointLocation", "/tmp/pyspark/") \
+                                        .option("forceDeleteTempCheckpointLocation", "true") \
+                                        .option("spark.mongodb.connection.uri", "mongodb://localhost") \
+                                        .option("spark.mongodb.database", "spotifyx") \
+                                        .option("spark.mongodb.collection", "trendTracks") \
+                                        .outputMode("complete")
