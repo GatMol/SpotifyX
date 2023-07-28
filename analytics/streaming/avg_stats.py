@@ -1,6 +1,4 @@
-from pyspark.sql import SparkSession
 from pyspark.sql.functions import avg, window, bround
-
 
 def calculate_avg_stats(data):
 
