@@ -168,4 +168,4 @@ dataset/*
 export_credentials.txt
 !*.py
 output/*
-producers/*.json
+producers/*/*.json
