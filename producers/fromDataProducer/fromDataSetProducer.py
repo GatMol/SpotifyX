@@ -14,13 +14,13 @@ if not os.path.exists(playlist_path):
 else:
     playlist_ids = json.load(open(playlist_path, "r"))
 
-streaming_data_path = current_dir + "/../dataset/streaming_data"
+streaming_data_path = current_dir + "/../../dataset/streaming_data"
 
 batch_size = 50
 time_to_sleep = 30 # seconds to wait between requests
 
 # create Kafka producer to send messages to the topic 'json-topic'
-producer = KafkaProducer(value_serializer=lambda m: json.dumps(m).encode('ascii'), bootstrap_servers=['localhost:9092'])
+producer = KafkaProducer(value_serializer=lambda m: json.dumps(m).encode('ascii'), bootstrap_servers=['kafka:29092'])
 
 # get the list of files in the streaming_data folder and shuffle it
 files = os.listdir(streaming_data_path)
@@ -38,7 +38,7 @@ for file in files:
             # if the playlist is already in the database, skip it
             if playlist["pid"] in playlist_ids["ids"]:
                 continue
-            producer.send('json-topic', playlist)
+            producer.send('playlist-topic', playlist)
             playlist_ids["ids"].append(playlist["pid"])
             json.dump(playlist_ids, open(playlist_path, "w"))
             current_batch_size += 1

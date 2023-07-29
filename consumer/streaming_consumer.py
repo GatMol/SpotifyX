@@ -11,7 +11,7 @@ from analytics.streaming import bestPlaylist4Artist, playlist2followers, trendAr
 spark = SparkSession.builder.appName('StreamingConsumer').getOrCreate()
 
 # read stream from kafka using spark
-lines = spark.readStream.format('kafka').option('kafka.bootstrap.servers', 'localhost:9092').option('subscribe', 'json-topic').load()
+lines = spark.readStream.format('kafka').option('kafka.bootstrap.servers', 'localhost:9092').option('subscribe', 'playlist-topic').load()
 
 # define schema for the streaming data
 schema = StructType([

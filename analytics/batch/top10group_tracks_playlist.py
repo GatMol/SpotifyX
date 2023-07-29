@@ -66,4 +66,4 @@ grouped_playlist_df = playlist_df.withColumn("rank", row_number().over(window_sp
 # order by group
 grouped_playlist_df = grouped_playlist_df.orderBy("group")
 # write the output file
-grouped_playlist_df.write.format("mongo").mode("overwrite").save()
+grouped_playlist_df.write.format("mongodb").mode("overwrite").save()
