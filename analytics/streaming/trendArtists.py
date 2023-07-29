@@ -6,7 +6,7 @@ def trendArtists(df):
     # explode tracks column (each row represent a track in playlists)
     tracks_df = df.withColumn("track", explode("tracks")).select("timestamp", "track.artist_name", "name", "num_followers", "num_tracks")
 
-    # group by window and artist, counting how many tracks have in all playlists
+    # group by artist, counting how many tracks have in all playlists
     artist2numTracks = tracks_df.groupBy(tracks_df.artist_name).count().withColumnRenamed("count", "num_artist_tracks_in_all_playlists")
 
     # sort (needed???)
