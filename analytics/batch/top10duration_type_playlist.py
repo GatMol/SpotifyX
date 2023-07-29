@@ -10,22 +10,27 @@ import argparse
 # create argument parser
 parser = argparse.ArgumentParser()
 parser.add_argument("--input", help="the input directory or file path", type=str)
-parser.add_argument("--output", help="the output directory path", type=str)
-
-# create spark session
-spark = SparkSession. \
-            builder. \
-            config("spark.driver.host", "localhost"). \
-            config("spark.driver.memory", "10g"). \
-            config("spark.executor.memory", "10g"). \
-            config("spark.sql.broadcastTimeout", "36000"). \
-            appName("Top10durationTypePlaylist"). \
-            getOrCreate()
+parser.add_argument("--output", help="the output collection name", type=str)
 
 # parse the arguments
 args = parser.parse_args()
 input_file = args.input
-output_dir = args.output
+output_collection = args.output
+
+# create spark session
+spark = SparkSession \
+            .builder \
+            .config("spark.driver.host", "localhost") \
+            .config("spark.driver.memory", "10g") \
+            .config("spark.executor.memory", "10g") \
+            .config("spark.sql.broadcastTimeout", "36000") \
+            .appName("Top10durationTypePlaylist") \
+            .config("checkpointLocation", "/tmp/pyspark/") \
+            .config("forceDeleteTempCheckpointLocation", "true") \
+            .config("spark.mongodb.connection.uri", "mongodb://localhost") \
+            .config("spark.mongodb.database", "spotifyx") \
+            .config("spark.mongodb.collection", output_collection) \
+            .getOrCreate()
 
 # duration types (short, medium, long) in seconds
 duration_types = {"short": {"min": 0, "max": 1000}, "medium": {"min": 1000, "max": 10000}, "long": {"min": 10000, "max": 10000000000000}}
@@ -50,4 +55,4 @@ duration_df = duration_df.withColumn("rank", row_number().over(playlist_window))
                                                         .select("duration_type", "name", "num_followers", "duration_ms", "rank")
 
 # write the result to the output directory
-duration_df.write.json(output_dir + "/top10durationTypePlaylist", mode="overwrite")
+duration_df.write.format("mongodb").mode("overwrite").save()

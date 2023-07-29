@@ -17,4 +17,10 @@ def bestPlaylist4Artist(df):
     # calculate listened artist index (number of tracks in playlists * log10(number of followers) / 250 (max number of tracks in a playlist))
     artistPlaylist2index = artistPlaylist2numTracks.withColumn("index", calculateIndex(col("num_followers"), col("num_artist_tracks"), col("num_tracks")))
 
-    return artistPlaylist2index.writeStream.format('console').outputMode('complete')
+    return artistPlaylist2index.writeStream.format("mongodb") \
+                                        .option("checkpointLocation", "/tmp/pyspark/") \
+                                        .option("forceDeleteTempCheckpointLocation", "true") \
+                                        .option("spark.mongodb.connection.uri", "mongodb://localhost") \
+                                        .option("spark.mongodb.database", "spotifyx") \
+                                        .option("spark.mongodb.collection", "bestPlaylist4Artist") \
+                                        .outputMode("complete")

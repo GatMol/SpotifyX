@@ -36,7 +36,7 @@ max_offset = 950 # the maximum offset allowed
 
 
 # create Kafka producer to send messages to the topic 'json-topic'
-producer = KafkaProducer(value_serializer=lambda m: json.dumps(m).encode('ascii'), bootstrap_servers=['localhost:9092'])
+producer = KafkaProducer(value_serializer=lambda m: json.dumps(m).encode('ascii'), bootstrap_servers=['kafka:29092'])
 
 # for each letter in the alphabet search for new playlists 
 # sleep for second_to_sleep seconds between requests and send the results to kafka
@@ -91,7 +91,7 @@ for letter in alfabeto:
             playlist["num_artists"] = len(artist_uris)
             playlist["timestamp"] = int(time.time())
 
-            producer.send('json-topic', playlist)
+            producer.send('playlist-topic', playlist)
             playlist_ids["ids"].append(playlist["pid"])
             json.dump(playlist_ids, open(playlist_path, "w"))
 

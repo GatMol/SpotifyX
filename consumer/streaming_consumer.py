@@ -5,13 +5,13 @@ import sys, os
 # get absolute path of project root folder
 projectRootPath = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, projectRootPath)
-from analytics.streaming import bestPlaylist4Artist, playlist2followers, trendArtists
+from analytics.streaming import bestPlaylist4Artist, playlist2followers, trendArtists, avg_stats, trendTracks
 
 # define spark session
 spark = SparkSession.builder.appName('StreamingConsumer').getOrCreate()
 
 # read stream from kafka using spark
-lines = spark.readStream.format('kafka').option('kafka.bootstrap.servers', 'localhost:9092').option('subscribe', 'json-topic').load()
+lines = spark.readStream.format('kafka').option('kafka.bootstrap.servers', 'localhost:9092').option('subscribe', 'playlist-topic').load()
 
 # define schema for the streaming data
 schema = StructType([
@@ -24,6 +24,7 @@ schema = StructType([
                 StructField("num_albums", IntegerType()),
                 StructField("num_followers", IntegerType()),
                 StructField("duration_ms", IntegerType()),
+                StructField("num_artists", IntegerType()),
                 StructField("tracks", ArrayType(StructType([
                     StructField("pos", IntegerType()),
                     StructField("artist_name", StringType()),
@@ -45,13 +46,19 @@ data = lines.select(from_json(col("value").cast("string"), schema).alias("parsed
 playlist2followersStreamWriter = playlist2followers.playlist2followers(data)
 trendArtistsStreamWriter = trendArtists.trendArtists(data)
 bestPlaylist4ArtistStreamWriter = bestPlaylist4Artist.bestPlaylist4Artist(data)
+avg_statsStreamWriter = avg_stats.calculate_avg_stats(data)
+trendTracksStreamWriter = trendTracks.trendTracks(data)
 
 # start all streaming processing
 playlist2followersQuery = playlist2followersStreamWriter.start()
 trendArtistQuery = trendArtistsStreamWriter.start()
 bestPlaylist4ArtistQuery = bestPlaylist4ArtistStreamWriter.start()
+avg_statsQuery = avg_statsStreamWriter.start()
+trendTracksQuery = trendTracksStreamWriter.start()
 
 # await for all queries started
 playlist2followersQuery.awaitTermination()
 trendArtistQuery.awaitTermination()
 bestPlaylist4ArtistQuery.awaitTermination()
+avg_statsQuery.awaitTermination()
+trendTracksQuery.awaitTermination()

@@ -1,6 +1,4 @@
-from pyspark.sql import SparkSession
 from pyspark.sql.functions import avg, window, bround
-
 
 def calculate_avg_stats(data):
 
@@ -19,5 +17,11 @@ def calculate_avg_stats(data):
           bround(avg("num_artists"), 2).alias("avg_num_artists"))
 
     # TODO: write the result to mongodb
-    dataStreamWriter = windowed_data.writeStream.format('console').outputMode('complete')
+    dataStreamWriter = windowed_data.writeStream.format("mongodb") \
+                                        .option("checkpointLocation", "/tmp/pyspark/") \
+                                        .option("forceDeleteTempCheckpointLocation", "true") \
+                                        .option("spark.mongodb.connection.uri", "mongodb://localhost") \
+                                        .option("spark.mongodb.database", "spotifyx") \
+                                        .option("spark.mongodb.collection", "avg_stats") \
+                                        .outputMode("complete")
     return dataStreamWriter

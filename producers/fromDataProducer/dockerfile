@@ -1,0 +1,4 @@
+FROM python:3.8
+ADD fromDataSetProducer.py /producers/fromDataProducer/
+RUN pip install kafka-python 
+CMD ["python", "/producers/fromDataProducer/fromDataSetProducer.py"]

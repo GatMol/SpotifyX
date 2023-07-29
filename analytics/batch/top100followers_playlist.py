@@ -7,20 +7,25 @@ import argparse
 # create argument parser
 parser = argparse.ArgumentParser()
 parser.add_argument("--input", help="the input directory or file path", type=str)
-parser.add_argument("--output", help="the output directory path", type=str)
-
-# create spark session
-spark = SparkSession. \
-            builder. \
-            config("spark.driver.host", "localhost"). \
-            config("spark.executor.memory", "16g"). \
-            appName("Top100Followers"). \
-            getOrCreate()
+parser.add_argument("--output", help="the output collection name", type=str)
 
 # read the input file
 args = parser.parse_args()
 input_file = args.input
-output_dir = args.output
+output_collection = args.output
+
+# create spark session
+spark = SparkSession \
+            .builder \
+            .config("spark.driver.host", "localhost") \
+            .config("spark.executor.memory", "6g") \
+            .appName("Top100Followers") \
+            .config("checkpointLocation", "/tmp/pyspark/") \
+            .config("forceDeleteTempCheckpointLocation", "true") \
+            .config("spark.mongodb.connection.uri", "mongodb://localhost") \
+            .config("spark.mongodb.database", "spotifyx") \
+            .config("spark.mongodb.collection", output_collection) \
+            .getOrCreate()
 
 min_num_followers = 10
 min_num_tracks = 10
@@ -28,4 +33,4 @@ input_df = spark.read.json(input_file).filter(col("num_followers") >= min_num_fo
 
 playlist_df = input_df.sort(desc("num_followers")).limit(100)
 
-playlist_df.write.json(output_dir + "/top100followers_playlist.json", mode="overwrite")
+playlist_df.write.format("mongodb").mode("overwrite").save()

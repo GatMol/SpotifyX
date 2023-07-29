@@ -3,7 +3,7 @@ import subprocess
 import sys
 
 # define kafka consumer
-consumer = KafkaConsumer('json-topic', bootstrap_servers='localhost:9092', value_deserializer=lambda x: x.decode('utf-8'))
+consumer = KafkaConsumer('playlist-topic', bootstrap_servers='localhost:9092', value_deserializer=lambda x: x.decode('utf-8'))
 
 # TODO: divide json files so that contains only 1000 playlists avoiding to have a single file with all the playlists???
 
