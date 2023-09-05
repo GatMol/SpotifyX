@@ -28,7 +28,7 @@
 Di seguito i passi per eseguire il progetto su AWS, ma prima sono elencati i requisiti necessari
 
 ### Requisiti
-- Creare un account MongoDB con un database chiamato `spotifyxcluster`
+- Creare un account MongoDB con un database chiamato `spotifyx`
 
 Ora sei pronto a lanciare il progetto in cloud usando AWS. Segui i seguenti passi:
 1. Lanciare un'istanza EC2 con Kafka e Zookeeper installati (seguendo la [guida](https://medium.com/@khasnobis.sanjit890/installing-apache-kafka-in-aws-ec2-instance-own-your-kafka-server-for-0-0992-per-hour-32cd78e7cf27))
