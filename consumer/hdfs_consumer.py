@@ -1,9 +1,12 @@
 from kafka import KafkaConsumer
 import subprocess
 import sys
+from awsConfig import *
 
 # define kafka consumer
-consumer = KafkaConsumer('playlist-topic', bootstrap_servers='localhost:9092', value_deserializer=lambda x: x.decode('utf-8'))
+# consumer = KafkaConsumer('playlist-topic', bootstrap_servers='localhost:9092', value_deserializer=lambda x: x.decode('utf-8'))
+# kafka consumer deployed on aws emr
+consumer = KafkaConsumer('playlist-topic', bootstrap_servers=kafka_broker_IP+":"+kafka_port, value_deserializer=lambda x: x.decode('utf-8'))
 
 # TODO: divide json files so that contains only 1000 playlists avoiding to have a single file with all the playlists???
 

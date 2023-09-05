@@ -2,6 +2,9 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, from_json
 from pyspark.sql.types import StructType, StructField, StringType, ArrayType, IntegerType, TimestampType
 import sys, os
+
+from awsConfig import *
+
 # get absolute path of project root folder
 projectRootPath = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, projectRootPath)
@@ -9,9 +12,12 @@ from analytics.streaming import bestPlaylist4Artist, playlist2followers, trendAr
 
 # define spark session
 spark = SparkSession.builder.appName('StreamingConsumer').getOrCreate()
+sc = spark.sparkContext
 
 # read stream from kafka using spark
-lines = spark.readStream.format('kafka').option('kafka.bootstrap.servers', 'localhost:9092').option('subscribe', 'playlist-topic').load()
+# lines = spark.readStream.format('kafka').option('kafka.bootstrap.servers', 'localhost:9092').option('subscribe', 'playlist-topic').load()
+# kafka consumer deployed on aws emr
+lines = spark.readStream.format('kafka').option('kafka.bootstrap.servers', kafka_broker_IP+":"+kafka_port).option('subscribe', 'playlist-topic').load()
 
 # define schema for the streaming data
 schema = StructType([

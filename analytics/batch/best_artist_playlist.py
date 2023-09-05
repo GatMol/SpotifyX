@@ -3,9 +3,8 @@
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import explode, row_number, desc, col, log, count
 from pyspark.sql.window import Window
-from pyspark.sql.types import ArrayType, StringType
-from pyspark.sql.functions import udf
 import argparse
+from mongoConfig import mongo_uri
 
 # create argument parser
 parser = argparse.ArgumentParser()
@@ -27,7 +26,7 @@ spark = SparkSession \
             .appName("best_artist_playlist") \
             .config("checkpointLocation", "/tmp/pyspark/") \
             .config("forceDeleteTempCheckpointLocation", "true") \
-            .config("spark.mongodb.connection.uri", "mongodb://localhost") \
+            .config("spark.mongodb.connection.uri", mongo_uri) \
             .config("spark.mongodb.database", "spotifyx") \
             .config("spark.mongodb.collection", output_collection) \
             .getOrCreate()

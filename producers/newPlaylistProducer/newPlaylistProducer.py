@@ -7,6 +7,8 @@ import time
 import random
 from kafka import KafkaProducer
 
+from awsConfig import *
+
 random.seed(42)
 
 auth_manager = SpotifyClientCredentials()
@@ -36,7 +38,9 @@ max_offset = 950 # the maximum offset allowed
 
 
 # create Kafka producer to send messages to the topic 'json-topic'
-producer = KafkaProducer(value_serializer=lambda m: json.dumps(m).encode('ascii'), bootstrap_servers=['kafka:29092'])
+# producer = KafkaProducer(value_serializer=lambda m: json.dumps(m).encode('ascii'), bootstrap_servers=['kafka:29092'])
+# variante per deploy su aws: kafka -> ip pubblico del cluster ec2 su cui runna kafka
+producer = KafkaProducer(value_serializer=lambda m: json.dumps(m).encode('ascii'), bootstrap_servers=[kafka_broker_IP+":"+kafka_port])
 
 # for each letter in the alphabet search for new playlists 
 # sleep for second_to_sleep seconds between requests and send the results to kafka

@@ -1,4 +1,5 @@
-from pyspark.sql.functions import explode, col, window
+from pyspark.sql.functions import explode
+from mongoConfig import mongo_uri
 
 def trendArtists(df):
     """Return artists with more tracks in all playlists"""
@@ -16,7 +17,7 @@ def trendArtists(df):
     return artist2numTracks.writeStream.format("mongodb") \
                                         .option("checkpointLocation", "/tmp/pyspark/") \
                                         .option("forceDeleteTempCheckpointLocation", "true") \
-                                        .option("spark.mongodb.connection.uri", "mongodb://localhost") \
+                                        .option("spark.mongodb.connection.uri", mongo_uri) \
                                         .option("spark.mongodb.database", "spotifyx") \
                                         .option("spark.mongodb.collection", "trendArtists") \
                                         .outputMode("complete")

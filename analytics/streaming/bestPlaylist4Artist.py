@@ -1,5 +1,6 @@
 from pyspark.sql.functions import explode, udf, log, col
 from pyspark.sql.types import DoubleType
+from mongoConfig import mongo_uri
 
 def bestPlaylist4Artist(df):
     tracks_df = df.withColumn("track", explode("tracks")).select("track.artist_name", "name", "num_followers", "num_tracks")
@@ -20,7 +21,7 @@ def bestPlaylist4Artist(df):
     return artistPlaylist2index.writeStream.format("mongodb") \
                                         .option("checkpointLocation", "/tmp/pyspark/") \
                                         .option("forceDeleteTempCheckpointLocation", "true") \
-                                        .option("spark.mongodb.connection.uri", "mongodb://localhost") \
+                                        .option("spark.mongodb.connection.uri", mongo_uri) \
                                         .option("spark.mongodb.database", "spotifyx") \
                                         .option("spark.mongodb.collection", "bestPlaylist4Artist") \
                                         .outputMode("complete")
