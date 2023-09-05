@@ -41,11 +41,11 @@ Ora sei pronto a lanciare il progetto in cloud usando AWS. Segui i seguenti pass
 8. Lancia i [producer](./producers/) in locale
 
 ## File di configurazione
-- Crea un file `analytics/mongoConfig.py` nella root del progetto con le seguenti variabili:
+- Crea il file `analytics/mongoConfig.py` con le seguenti variabili:
 ```python
 mongo_uri = "<mongo connection string uri>"
 ```
-- Crea un file `./awsConfig.py` nella root del progetto con le seguenti variabili:
+- Crea il file `./awsConfig.py` nella root del progetto con le seguenti variabili:
 ```python
 kafka_broker_IP="<public ip ec2 instance with kafka (and zookeeper) running on it>"
 kafka_port="<port used in security group TCP custom>"
