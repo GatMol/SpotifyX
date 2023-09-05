@@ -1,4 +1,5 @@
 from pyspark.sql.functions import explode
+from mongoConfig import mongo_uri
 
 def trendTracks(df):
     """Return tracks more present in all playlists"""
@@ -12,7 +13,7 @@ def trendTracks(df):
     return track2numTracks.writeStream.format("mongodb") \
                                         .option("checkpointLocation", "/tmp/pyspark/") \
                                         .option("forceDeleteTempCheckpointLocation", "true") \
-                                        .option("spark.mongodb.connection.uri", "mongodb://localhost") \
+                                        .option("spark.mongodb.connection.uri", mongo_uri) \
                                         .option("spark.mongodb.database", "spotifyx") \
                                         .option("spark.mongodb.collection", "trendTracks") \
                                         .outputMode("complete")

@@ -1,4 +1,5 @@
 from pyspark.sql.functions import avg, window, bround
+from mongoConfig import mongo_uri
 
 def calculate_avg_stats(data):
 
@@ -20,7 +21,7 @@ def calculate_avg_stats(data):
     dataStreamWriter = windowed_data.writeStream.format("mongodb") \
                                         .option("checkpointLocation", "/tmp/pyspark/") \
                                         .option("forceDeleteTempCheckpointLocation", "true") \
-                                        .option("spark.mongodb.connection.uri", "mongodb://localhost") \
+                                        .option("spark.mongodb.connection.uri", mongo_uri) \
                                         .option("spark.mongodb.database", "spotifyx") \
                                         .option("spark.mongodb.collection", "avg_stats") \
                                         .outputMode("complete")

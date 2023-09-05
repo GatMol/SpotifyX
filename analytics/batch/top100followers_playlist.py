@@ -4,6 +4,8 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, desc
 import argparse
 
+from mongoConfig import mongo_uri
+
 # create argument parser
 parser = argparse.ArgumentParser()
 parser.add_argument("--input", help="the input directory or file path", type=str)
@@ -22,7 +24,7 @@ spark = SparkSession \
             .appName("Top100Followers") \
             .config("checkpointLocation", "/tmp/pyspark/") \
             .config("forceDeleteTempCheckpointLocation", "true") \
-            .config("spark.mongodb.connection.uri", "mongodb://localhost") \
+            .config("spark.mongodb.connection.uri", mongo_uri) \
             .config("spark.mongodb.database", "spotifyx") \
             .config("spark.mongodb.collection", output_collection) \
             .getOrCreate()

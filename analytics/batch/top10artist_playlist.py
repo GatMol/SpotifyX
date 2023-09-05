@@ -5,6 +5,8 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import explode, desc, col, row_number
 from pyspark.sql.window import Window
 
+from mongoConfig import mongo_uri
+
 import argparse
 
 # create argument parser
@@ -26,7 +28,7 @@ spark = SparkSession \
             .appName("Top10Artist_playlists") \
             .config("checkpointLocation", "/tmp/pyspark/") \
             .config("forceDeleteTempCheckpointLocation", "true") \
-            .config("spark.mongodb.connection.uri", "mongodb://localhost") \
+            .config("spark.mongodb.connection.uri", mongo_uri) \
             .config("spark.mongodb.database", "spotifyx") \
             .config("spark.mongodb.collection", output_collection) \
             .getOrCreate()
