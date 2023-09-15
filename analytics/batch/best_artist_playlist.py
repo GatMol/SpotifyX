@@ -20,8 +20,8 @@ output_collection = args.output
 spark = SparkSession \
             .builder \
             .config("spark.driver.host", "localhost") \
-            .config("spark.driver.memory", "10g") \
-            .config("spark.executor.memory", "10g") \
+            .config("spark.driver.memory", "6g") \
+            .config("spark.executor.memory", "6g") \
             .config("spark.sql.broadcastTimeout", "36000") \
             .appName("best_artist_playlist") \
             .config("checkpointLocation", "/tmp/pyspark/") \

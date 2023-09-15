@@ -8,6 +8,11 @@ from pyspark.sql.window import Window
 import argparse
 
 from mongoConfig import mongo_uri
+import os
+import sys
+
+os.environ['PYSPARK_PYTHON'] = sys.executable
+os.environ['PYSPARK_DRIVER_PYTHON'] = sys.executable
 
 # create argument parser
 parser = argparse.ArgumentParser()
@@ -24,7 +29,7 @@ output_collection = args.output
 spark = SparkSession \
             .builder \
             .config("spark.driver.host", "localhost") \
-            .config("spark.executor.memory", "8g") \
+            .config("spark.executor.memory", "6g") \
             .config("spark.storage.memoryFraction", "0") \
             .config("shuffle.memoryFraction", "0") \
             .appName("Top10Track_playlists") \

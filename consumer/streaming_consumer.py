@@ -3,7 +3,7 @@ from pyspark.sql.functions import col, from_json
 from pyspark.sql.types import StructType, StructField, StringType, ArrayType, IntegerType, TimestampType
 import sys, os
 
-from awsConfig import *
+from consumer.awsConfig import *
 
 # get absolute path of project root folder
 projectRootPath = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))

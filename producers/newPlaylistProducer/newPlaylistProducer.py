@@ -7,7 +7,7 @@ import time
 import random
 from kafka import KafkaProducer
 
-from awsConfig import *
+from consumer.awsConfig import *
 
 random.seed(42)
 

@@ -23,7 +23,7 @@ output_collection = args.output
 spark = SparkSession \
             .builder \
             .config("spark.driver.host", "localhost") \
-            .config("spark.executor.memory", "8g") \
+            .config("spark.executor.memory", "6g") \
             .config("spark.storage.memoryFraction", "0.2") \
             .appName("Top10Artist_playlists") \
             .config("checkpointLocation", "/tmp/pyspark/") \

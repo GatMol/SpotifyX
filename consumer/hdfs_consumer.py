@@ -1,7 +1,7 @@
 from kafka import KafkaConsumer
 import subprocess
 import sys
-from awsConfig import *
+from consumer.awsConfig import *
 
 # define kafka consumer
 # consumer = KafkaConsumer('playlist-topic', bootstrap_servers='localhost:9092', value_deserializer=lambda x: x.decode('utf-8'))

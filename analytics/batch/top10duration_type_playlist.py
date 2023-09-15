@@ -8,6 +8,11 @@ from pyspark.sql.functions import udf
 import argparse
 
 from mongoConfig import mongo_uri
+import os
+import sys
+
+os.environ['PYSPARK_PYTHON'] = sys.executable
+os.environ['PYSPARK_DRIVER_PYTHON'] = sys.executable
 
 # create argument parser
 parser = argparse.ArgumentParser()
@@ -23,8 +28,8 @@ output_collection = args.output
 spark = SparkSession \
             .builder \
             .config("spark.driver.host", "localhost") \
-            .config("spark.driver.memory", "10g") \
-            .config("spark.executor.memory", "10g") \
+            .config("spark.driver.memory", "6g") \
+            .config("spark.executor.memory", "6g") \
             .config("spark.sql.broadcastTimeout", "36000") \
             .appName("Top10durationTypePlaylist") \
             .config("checkpointLocation", "/tmp/pyspark/") \

@@ -5,6 +5,11 @@ from pyspark.sql.functions import col, desc
 import argparse
 
 from mongoConfig import mongo_uri
+import os
+import sys
+
+os.environ['PYSPARK_PYTHON'] = sys.executable
+os.environ['PYSPARK_DRIVER_PYTHON'] = sys.executable
 
 # create argument parser
 parser = argparse.ArgumentParser()
