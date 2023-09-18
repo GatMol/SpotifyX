@@ -2,9 +2,12 @@
 # top 100 (per num_followers) spotify playlists con almeno 10 tracks
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, desc
+from pyspark.sql.types import StructType, StructField, StringType, ArrayType, IntegerType
+
 import argparse
 
 from mongoConfig import mongo_uri
+from awsConfig import emr_IP
 
 # create argument parser
 parser = argparse.ArgumentParser()
@@ -19,7 +22,7 @@ output_collection = args.output
 # create spark session
 spark = SparkSession \
             .builder \
-            .config("spark.driver.host", "localhost") \
+            .config("spark.driver.host", emr_IP) \
             .config("spark.executor.memory", "6g") \
             .appName("Top100Followers") \
             .config("checkpointLocation", "/tmp/pyspark/") \
@@ -28,6 +31,29 @@ spark = SparkSession \
             .config("spark.mongodb.database", "spotifyx") \
             .config("spark.mongodb.collection", output_collection) \
             .getOrCreate()
+
+# Define json schema (to make it work in AWS)
+schema = StructType([
+                StructField("name", StringType()),
+                StructField("collaborative", StringType()),
+                StructField("pid", IntegerType()),
+                StructField("modified_at", StringType()),
+                StructField("num_tracks", IntegerType()),
+                StructField("num_albums", IntegerType()),
+                StructField("num_followers", IntegerType()),
+                StructField("duration_ms", IntegerType()),
+                StructField("num_artists", IntegerType()),
+                StructField("tracks", ArrayType(StructType([
+                    StructField("pos", IntegerType()),
+                    StructField("artist_name", StringType()),
+                    StructField("track_uri", StringType()),
+                    StructField("artist_uri", StringType()),
+                    StructField("track_name", StringType()),
+                    StructField("album_uri", StringType()),
+                    StructField("duration_ms", IntegerType()),
+                    StructField("album_name", StringType())
+                ])))
+            ])
 
 min_num_followers = 10
 min_num_tracks = 10
